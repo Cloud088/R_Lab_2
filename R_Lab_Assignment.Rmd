@@ -1,0 +1,254 @@
+---
+title: "DS311 - R Lab Assignment"
+author: "Miles Mendez"
+date: "11/28/23"
+output:
+  pdf_document: default
+  html_document:
+    theme: united
+    highlight: tango
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Assignment 1
+
+* In this assignment, we are going to apply some of the build in data set in R for descriptive statistics analysis.
+* To earn full grade in this assignment, students need to complete the coding tasks for each question to get the result.
+* After finished all the questions, knit the document into HTML format for submission.
+
+### Question 1
+
+Using the **mtcars** data set in R, please answer the following questions.
+
+```{r}
+# Loading the data
+data(mtcars)
+
+# Head of the data set
+head(mtcars)
+```
+
+a. Report the number of variables and observations in the data set.
+
+```{r}
+# Enter your code here!
+?mtcars
+dim(mtcars)
+names(mtcars)
+
+# Answer:
+print("There are total of 11 numeric variables and 32 observations in this data set.")
+```
+
+
+b. Print the summary statistics of the data set and report how many discrete and continuous variables are in the data set.
+
+```{r}
+# Enter your code here!
+summary(mtcars)
+
+
+# Answer:
+print("There are 5 discrete variables and 6 continuous variables in this data set.")
+```
+
+
+
+c. Calculate the mean, variance, and standard deviation for the variable **mpg** and assign them into variable names m, v, and s. Report the results in the print statement.
+
+```{r}
+# Enter your code here!
+m <- mean(mtcars$mpg)
+v<-var(mtcars$mpg)
+s<-sd(mtcars$mpg)
+
+
+
+print(paste("The average of Mile Per Gallon from this data set is ", m , " with variance ", v , " and standard deviation", s , "."))
+```
+
+
+
+d. Create two tables to summarize 1) average mpg for each cylinder class and 2) the standard deviation of mpg for each gear class.
+
+```{r}
+# Enter your code here!
+m_mpg_cyl<-aggregate(mpg ~ cyl, mtcars, mean)
+sd_mpg_gr<-aggregate(mpg ~ cyl, mtcars, sd)
+
+print(m_mpg_cyl)
+print(sd_mpg_gr)
+
+
+
+```
+
+
+
+e. Create a crosstab that shows the number of observations belong to each cylinder and gear class combinations. The table should show how many observations given the car has 4 cylinders with 3 gears, 4 cylinders with 4 gears, etc. Report which combination is recorded in this data set and how many observations for this type of car.
+
+```{r}
+# Enter your code here!
+cyl_gr_ctable<-table(mtcars$cyl, mtcars$gear)
+print(cyl_gr_ctable)
+
+print("The most common car type in this data set is car with 8 cylinders and 3 gears. There are total of 12 cars belong to this specification in the data set.")
+```
+
+
+*** 
+
+### Question 2
+
+Use different visualization tools to summarize the data sets in this question.
+
+a. Using the **PlantGrowth** data set, visualize and compare the weight of the plant in the three separated group. Give labels to the title, x-axis, and y-axis on the graph. Write a paragraph to summarize your findings.
+
+```{r}
+# Load the data set
+data("PlantGrowth")
+
+# Head of the data set
+head(PlantGrowth)
+
+# Enter your code here!
+
+library(ggplot2)
+
+ggplot(PlantGrowth, aes(x=group, y=weight, fill=group))+geom_boxplot()+
+  labs(title="Plant Weight Groups", x="Group", y="Weight")
+
+```
+
+Result:
+
+=> Report a paragraph to summarize your findings from the plot!
+The Plant weight groups reflect that the treatment groups provided vastly different results on both ends of the control group. Treatment 1 had the most similarities with the control group while treatment 2 was on the upper end of the control range barely intersecting at all. Treatment 2 produced bigger, healthier plants given this data. Treatment 2 had the highest median followed by the control and then treatment 1.The upper quartile for treatment 1 was very small with most plants in this group reflecting quartile 3 and 2. the median for the control group was roughly ~5.2, treatment 1 ~4.55, and treatment 3 at ~5.4.
+
+
+b. Using the **mtcars** data set, plot the histogram for the column **mpg** with 10 breaks. Give labels to the title, x-axis, and y-axis on the graph. Report the most observed mpg class from the data set.
+
+```{r}
+
+ggplot(data=mtcars)+geom_histogram(aes(x=mpg),bins=10)
+
+print("Most of the cars in this data set are in the class of 15 mile per gallon.")
+```
+
+
+
+c. Using the **USArrests** data set, create a pairs plot to display the correlations between the variables in the data set. Plot the scatter plot with **Murder** and **Assault**. Give labels to the title, x-axis, and y-axis on the graph. Write a paragraph to summarize your results from both plots.
+
+```{r}
+# Load the data set
+data("USArrests")
+
+# Head of the data set
+head(USArrests)
+
+# Enter your code here!
+
+pairs(USArrests, main="US Arrest Pair Plots")
+plot(USArrests$Murder, USArrests$Assault, xlab= "Murder", ylab="Assault", main="Murder & Assault Rates in US")
+
+```
+
+Result:
+
+=> Report a paragraph to summarize your findings from the plot!
+
+Assaults are far more common than murder. As assaults increase, murders also increase showing a positive correlation.The trend also seems pretty linear in nature.
+
+***
+
+### Question 3
+
+Download the housing data set from www.jaredlander.com and find out what explains the housing prices in New York City.
+
+Note: Check your working directory to make sure that you can download the data into the data folder. 
+
+```{r, echo=FALSE}
+# Load and clean the housing data set 
+download.file(url='https://www.jaredlander.com/data/housing.csv',
+              destfile='data/housing.csv', mode='wb')
+housingData <- read.csv('data/housing.csv')
+housingData <- subset(housingData, 
+                      select = c("Neighborhood", "Market.Value.per.SqFt", "Boro", "Year.Built"))
+housingData <- na.omit(housingData)                   
+```
+
+a. Create your own descriptive statistics and aggregation tables to summarize the data set and find any meaningful results between different variables in the data set.
+
+```{r}
+# Head of the cleaned data set
+head(housingData)
+
+# Enter your code here!
+summary(housingData)
+MVSFmean<-aggregate(Market.Value.per.SqFt~Boro, data=housingData, FUN=mean)
+MVSFvar<-aggregate(Market.Value.per.SqFt~Boro, data=housingData, FUN=var)
+MVSFsd<-aggregate(Market.Value.per.SqFt~Boro, data=housingData, FUN=sd)
+
+print(MVSFmean)
+print(MVSFvar)
+print(MVSFsd)
+
+MVYBmean<-aggregate(Market.Value.per.SqFt~Year.Built, data=housingData, FUN=mean)
+MVYBvar<-aggregate(Market.Value.per.SqFt~Year.Built, data=housingData, FUN=var)
+MVYBsd<-aggregate(Market.Value.per.SqFt~Year.Built, data=housingData, FUN=sd)
+
+print(MVYBmean)
+print(MVYBvar)
+print(MVYBsd)
+
+MVNmean<-aggregate(Market.Value.per.SqFt~Neighborhood, data=housingData, FUN=mean)
+MVNvar<-aggregate(Market.Value.per.SqFt~Neighborhood, data=housingData, FUN=var)
+MVNsd<-aggregate(Market.Value.per.SqFt~Neighborhood, data=housingData, FUN=sd)
+
+print(MVNmean)
+print(MVNvar)
+print(MVNsd)
+
+```
+
+b. Create multiple plots to demonstrates the correlations between different variables. Remember to label all axes and give title to each graph.
+
+```{r}
+# Enter your code here!
+plot(housingData$Year.Built, housingData$Market.Value.per.SqFt, 
+     main = "Market Value vs. Year Built",
+     xlab = "Year Built",
+     ylab = "Market Value by Sq. Ft")
+
+fit <- lm(Market.Value.per.SqFt ~ Year.Built, data = housingData)
+abline(fit, col = "red")
+
+boxplot(Market.Value.per.SqFt ~ Neighborhood, data = housingData,
+        main = "Market Value vs. Neighborhood",
+        xlab = "Neighborhood",
+        ylab = "Market Value by Sq. Ft")
+
+barplot(tapply(housingData$Market.Value.per.SqFt, housingData$Boro, mean),
+        main = "Average Market Value by Boro",
+        xlab = "Boro",
+        ylab = "Average Market Value by Sq. Ft",
+        col = "skyblue",
+        ylim = c(0, max(housingData$Market.Value.per.SqFt, na.rm = TRUE) + 10))
+
+boxplot(Year.Built ~ Boro, data = housingData,
+        main = "Boro vs. Year Built",
+        xlab = "Boro",
+        ylab = "Year Built",
+        col = "lightblue")
+
+```
+
+c. Write a summary about your findings from this exercise.
+
+=> Enter your answer here!
+
+Most of the homes were all built from 1980's to current. There aren't many buildings existing pre 1900 although there are few examples. Generally, newer houses command more market value per sq. ft despite there being many lower priced recent constructions. Manhattan commmands the highest avg. market value by a decent margin followed by Brooklyn and Queens which are very similar. The Bronx is one of the cheapest boros followed by Staten Island. The surprising thing when compared to previous rankings by boro is that Manhattan is older with its median falling around 1950. Despite it's older age, it still is high priced which may speak to the neighborhood safety, location or other factors. Staten Island sticks out as well due to a limited window of development around the 1980's which is still fairly new but is the cheapest by sq. foot. This could be due to location and inconvenience associated with this location. The Bronx and Queens were both developed around same time and also are priced similarly by sq. ft. Brooklyn has been developed most recently although houses contained in dataset also reflect examples tracing back to the 1900's.
